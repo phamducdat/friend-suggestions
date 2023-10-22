@@ -24,7 +24,5 @@ public class UserEntity {
     @NotNull
     private String name;
 
-    @Column(name = "primary_phone_number")
-    @Pattern(regexp = "^[0-9]{10}$", message = "primary phone number should be 10 digits")
     private String primaryPhoneNumber;
 }
