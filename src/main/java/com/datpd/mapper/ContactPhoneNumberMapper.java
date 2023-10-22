@@ -1,6 +1,6 @@
 package com.datpd.mapper;
 
-import com.datpd.dto.ContactPhoneNumbersDto;
+import com.datpd.dto.ContactPhoneNumberDto;
 import com.datpd.entity.ContactPhoneNumberEntity;
 import org.springframework.stereotype.Service;
 
@@ -10,17 +10,28 @@ import java.util.stream.Collectors;
 @Service
 public class ContactPhoneNumberMapper {
 
-    public List<ContactPhoneNumberEntity> map(ContactPhoneNumbersDto contactPhoneNumbersDto) {
-        return contactPhoneNumbersDto.getContactPhoneNumbers().stream().map(s -> {
-            return ContactPhoneNumberEntity.builder()
-                    .phoneNumber(s)
-                    .build();
-        }).collect(Collectors.toList());
+
+    public ContactPhoneNumberEntity map(long userId, ContactPhoneNumberDto contactPhoneNumberDto) {
+        return ContactPhoneNumberEntity.builder()
+                .userId(userId)
+                .contactUserName(contactPhoneNumberDto.getContactUserName())
+                .contactPhoneNumber(contactPhoneNumberDto.getContactPhoneNumber())
+                .build();
     }
 
-    public ContactPhoneNumbersDto map(List<ContactPhoneNumberEntity> contactPhoneNumberEntities) {
-        return ContactPhoneNumbersDto.builder()
-                .contactPhoneNumbers(contactPhoneNumberEntities.stream()
-                        .map(ContactPhoneNumberEntity::getPhoneNumber).collect(Collectors.toList())).build();
+    public List<ContactPhoneNumberEntity> map(long userId, List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
+        return contactPhoneNumberDtoList.stream().map(contactPhoneNumberDto -> map(userId, contactPhoneNumberDto)).collect(Collectors.toList());
     }
+
+    public ContactPhoneNumberDto map(ContactPhoneNumberEntity contactPhoneNumberEntity) {
+        return ContactPhoneNumberDto.builder()
+                .contactUserName(contactPhoneNumberEntity.getContactUserName())
+                .contactPhoneNumber(contactPhoneNumberEntity.getContactPhoneNumber())
+                .build();
+    }
+
+    public List<ContactPhoneNumberDto> map(List<ContactPhoneNumberEntity> contactPhoneNumberEntities) {
+        return contactPhoneNumberEntities.stream().map(this::map).collect(Collectors.toList());
+    }
+
 }

@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class ContactPhoneNumbersDto {
-
-    private List<String> contactPhoneNumbers;
+public class ContactPhoneNumberDto {
+    private String contactUserName;
+    private String contactPhoneNumber;
 }

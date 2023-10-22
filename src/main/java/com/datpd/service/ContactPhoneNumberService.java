@@ -1,6 +1,6 @@
 package com.datpd.service;
 
-import com.datpd.dto.ContactPhoneNumbersDto;
+import com.datpd.dto.ContactPhoneNumberDto;
 import com.datpd.entity.ContactPhoneNumberEntity;
 import com.datpd.mapper.ContactPhoneNumberMapper;
 import com.datpd.repository.ContactPhoneNumberRepository;
@@ -16,20 +16,22 @@ public class ContactPhoneNumberService {
     private final ContactPhoneNumberRepository contactPhoneNumberRepository;
     private final ContactPhoneNumberMapper contactPhoneNumberMapper;
 
-    public ContactPhoneNumberService(ContactPhoneNumberRepository contactPhoneNumberRepository, ContactPhoneNumberMapper contactPhoneNumberMapper) {
+    public ContactPhoneNumberService(ContactPhoneNumberRepository contactPhoneNumberRepository,
+                                     ContactPhoneNumberMapper contactPhoneNumberMapper) {
         this.contactPhoneNumberRepository = contactPhoneNumberRepository;
         this.contactPhoneNumberMapper = contactPhoneNumberMapper;
     }
 
-    private ContactPhoneNumbersDto getContactPhoneNumbersByUserId(long userId) {
-        List<ContactPhoneNumberEntity> contactPhoneNumberEntities =
-                contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
-
-        return contactPhoneNumberEntities.isEmpty() ? null : contactPhoneNumberMapper.map(contactPhoneNumberEntities);
+    public List<ContactPhoneNumberDto> getAllContactPhoneNumberByUserId(long userId) {
+        List<ContactPhoneNumberEntity> contactPhoneNumberEntities = contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
+        if (contactPhoneNumberEntities.size() > 0)
+            return contactPhoneNumberMapper.map(contactPhoneNumberEntities);
+        return null;
     }
 
-    private void updateContactPhoneNumbersByUserId(long userId, ContactPhoneNumbersDto contactPhoneNumbersDto) {
+    public void updateContactPhoneNumbersByUserId(long userId, List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
         contactPhoneNumberRepository.deleteAllByUserId(userId);
-        contactPhoneNumberRepository.saveAll(contactPhoneNumberMapper.map(contactPhoneNumbersDto));
+        contactPhoneNumberRepository.saveAll(contactPhoneNumberMapper.map(userId, contactPhoneNumberDtoList));
     }
+
 }

@@ -27,6 +27,9 @@ public class ContactPhoneNumberEntity {
     @NotNull
     private long userId;
 
+    private String contactUserName;
+
     @Pattern(regexp = "^[0-9]{10}$", message = "primary phone number should be 10 digits")
-    private String phoneNumber;
+    private String contactPhoneNumber;
+
 }

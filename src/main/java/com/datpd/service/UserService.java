@@ -31,7 +31,6 @@ public class UserService {
         log.info("Get user by id: {}", userId);
         Optional<UserEntity> userEntityOptional =
                 userRepository.findById(userId);
-
         return userEntityOptional.map(userMapper::map).orElse(null);
     }
 }

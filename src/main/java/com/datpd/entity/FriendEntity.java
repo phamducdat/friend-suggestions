@@ -24,5 +24,13 @@ public class FriendEntity {
 
     private long userId1;
 
+    private String userName1;
+
+    private String phoneNumber1;
+
     private long userId2;
+
+    private String userName2;
+
+    private String phoneNumber2;
 }
