@@ -5,6 +5,7 @@ import com.datpd.entity.UserEntity;
 import com.datpd.repository.ContactPhoneNumberRepository;
 import com.datpd.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +19,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StartConfig {
 
+    private final RedissonClient redissonClient;
     private final UserRepository userRepository;
     private final ContactPhoneNumberRepository contactPhoneNumberRepository;
 
-    public StartConfig(UserRepository userRepository,
+    public StartConfig(RedissonClient redissonClient, UserRepository userRepository,
                        ContactPhoneNumberRepository contactPhoneNumberRepository) {
+        this.redissonClient = redissonClient;
         this.userRepository = userRepository;
         this.contactPhoneNumberRepository = contactPhoneNumberRepository;
     }
@@ -32,6 +35,9 @@ public class StartConfig {
 
         // check if user_entity table is empty, then add a user
         return args -> {
+            // Reset Redis
+            redissonClient.getKeys().flushdb();
+
             if (userRepository.count() == 0) {
                 log.info("Init data to user_entity table");
                 for (int i = 1; i <= 100; i++) {
