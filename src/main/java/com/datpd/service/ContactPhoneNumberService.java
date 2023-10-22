@@ -22,14 +22,18 @@ public class ContactPhoneNumberService {
     private final ContactPhoneNumberMapper contactPhoneNumberMapper;
     private final FriendService friendService;
 
+    private final FriendSuggestionService friendSuggestionService;
     private final RedissonClient redissonClient;
 
     public ContactPhoneNumberService(ContactPhoneNumberRepository contactPhoneNumberRepository,
                                      ContactPhoneNumberMapper contactPhoneNumberMapper,
-                                     FriendService friendService, RedissonClient redissonClient) {
+                                     FriendService friendService,
+                                     FriendSuggestionService friendSuggestionService,
+                                     RedissonClient redissonClient) {
         this.contactPhoneNumberRepository = contactPhoneNumberRepository;
         this.contactPhoneNumberMapper = contactPhoneNumberMapper;
         this.friendService = friendService;
+        this.friendSuggestionService = friendSuggestionService;
         this.redissonClient = redissonClient;
     }
 
@@ -51,6 +55,7 @@ public class ContactPhoneNumberService {
         List<ContactPhoneNumberEntity> contactPhoneNumberEntities = contactPhoneNumberRepository.saveAll(contactPhoneNumberMapper.map(userId, contactPhoneNumberDtoList));
         friendSuggestionDtoListBucket.delete();
         friendService.makeFriends(userId, contactPhoneNumberEntities);
+        friendSuggestionService.makeFriendSuggestions(userId, contactPhoneNumberEntities);
     }
 
 }

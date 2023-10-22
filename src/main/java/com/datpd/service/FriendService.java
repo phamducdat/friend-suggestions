@@ -85,7 +85,7 @@ public class FriendService {
 
     @Transactional(rollbackFor = Exception.class)
     public void makeFriends(long userId, List<ContactPhoneNumberEntity> contactPhoneNumberEntities) {
-        log.info("Make Friends by userId: {}", userId);
+        log.info("Make Friends by userId: {} start", userId);
         Optional<UserEntity> optionalUserEntity1 = userRepository.findById(userId);
         if (optionalUserEntity1.isPresent()) {
             UserEntity userEntity1 = optionalUserEntity1.get();
@@ -103,6 +103,8 @@ public class FriendService {
                 }
             });
             friendsDtoBucket.delete();
+            log.info("Make Friends by userId: {} end", userId);
+
         }
     }
 
