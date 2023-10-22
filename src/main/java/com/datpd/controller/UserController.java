@@ -51,6 +51,12 @@ public class UserController {
         return contactPhoneNumberService.getAllContactPhoneNumberByUserId(userId);
     }
 
+    @PutMapping("/{userId}/contact-phone-number")
+    public void updateContactPhoneNumbersByUserId(@PathVariable long userId,
+                                                  @RequestBody List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
+        contactPhoneNumberService.updateContactPhoneNumbersByUserId(userId, contactPhoneNumberDtoList);
+    }
+
     @GetMapping("/{userId}/friends")
     public List<FriendDto> getFriendsByUserId(@PathVariable long userId) {
         return friendService.getAllFriendsByUserId(userId);
@@ -62,9 +68,4 @@ public class UserController {
     }
 
 
-    @PutMapping("/{userId}/contact-phone-numbers")
-    public void updateContactPhoneNumbersByUserId(@PathVariable long userId,
-                                                  @RequestBody List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
-        contactPhoneNumberService.updateContactPhoneNumbersByUserId(userId, contactPhoneNumberDtoList);
-    }
 }

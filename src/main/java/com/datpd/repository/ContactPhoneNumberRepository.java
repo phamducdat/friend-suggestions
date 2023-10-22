@@ -10,6 +10,10 @@ import java.util.List;
 public interface ContactPhoneNumberRepository extends JpaRepository<ContactPhoneNumberEntity, Long> {
     List<ContactPhoneNumberEntity> getContactPhoneNumberEntitiesByUserId(long userId);
 
+    ContactPhoneNumberEntity findByUserIdAndContactPhoneNumber(long userId, String contactPhoneNumber);
+
+    List<ContactPhoneNumberEntity> findAllByUserId(long userId);
+
     void deleteAllByUserId(long userId);
 
 }

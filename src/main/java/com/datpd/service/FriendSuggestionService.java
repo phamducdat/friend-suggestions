@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -27,14 +26,17 @@ public class FriendSuggestionService {
 
     private final FriendRepository friendRepository;
 
+    private final FriendService friendService;
+
     public FriendSuggestionService(UserRepository userRepository,
                                    ContactPhoneNumberRepository contactPhoneNumberRepository,
                                    FriendSuggestionMapper friendSuggestionMapper,
-                                   FriendRepository friendRepository) {
+                                   FriendRepository friendRepository, FriendService friendService) {
         this.userRepository = userRepository;
         this.contactPhoneNumberRepository = contactPhoneNumberRepository;
         this.friendSuggestionMapper = friendSuggestionMapper;
         this.friendRepository = friendRepository;
+        this.friendService = friendService;
     }
 
     public List<FriendSuggestionDto> getFriendSuggestionsByUserId(long userId) {
@@ -44,12 +46,7 @@ public class FriendSuggestionService {
             List<ContactPhoneNumberEntity> contactPhoneNumberEntities =
                     contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
 
-            Set<String> friendPhoneNumbers =
-                    friendRepository.findAllByUserId(userId).stream()
-                            .flatMap(friendEntity -> Stream.of(friendEntity.getPhoneNumber1(),
-                                    friendEntity.getPhoneNumber2()))
-                            .collect(Collectors.toSet());
-            log.info("friendPhoneNumbers: {}", friendPhoneNumbers.toString());
+            Set<String> friendPhoneNumbers = friendService.getFriendPhoneNumbersByUserId(userId);
 
             List<ContactPhoneNumberEntity> friendSuggestionPhoneNumbers =
                     contactPhoneNumberEntities.stream().filter(s -> !friendPhoneNumbers.contains(s.getContactPhoneNumber())
