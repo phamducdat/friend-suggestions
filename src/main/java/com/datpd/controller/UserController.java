@@ -2,15 +2,14 @@ package com.datpd.controller;
 
 import com.datpd.dto.ContactPhoneNumberDto;
 import com.datpd.dto.FriendDto;
+import com.datpd.dto.FriendSuggestionDto;
 import com.datpd.dto.UserDto;
 import com.datpd.service.ContactPhoneNumberService;
 import com.datpd.service.FriendService;
+import com.datpd.service.FriendSuggestionService;
 import com.datpd.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,10 +24,21 @@ public class UserController {
 
     private final FriendService friendService;
 
-    public UserController(UserService userService, ContactPhoneNumberService contactPhoneNumberService, FriendService friendService) {
+    private final FriendSuggestionService friendSuggestionService;
+
+    public UserController(UserService userService,
+                          ContactPhoneNumberService contactPhoneNumberService,
+                          FriendService friendService,
+                          FriendSuggestionService friendSuggestionService) {
         this.userService = userService;
         this.contactPhoneNumberService = contactPhoneNumberService;
         this.friendService = friendService;
+        this.friendSuggestionService = friendSuggestionService;
+    }
+
+    @GetMapping()
+    public List<UserDto> getUsers() {
+        return userService.getUsers();
     }
 
     @GetMapping("/{userId}")
@@ -44,5 +54,17 @@ public class UserController {
     @GetMapping("/{userId}/friends")
     public List<FriendDto> getFriendsByUserId(@PathVariable long userId) {
         return friendService.getAllFriendsByUserId(userId);
+    }
+
+    @GetMapping("/{userId}/friend-suggestions")
+    public List<FriendSuggestionDto> getFriendSuggestionsByUserId(@PathVariable long userId) {
+        return friendSuggestionService.getFriendSuggestionsByUserId(userId);
+    }
+
+
+    @PutMapping("/{userId}/contact-phone-numbers")
+    public void updateContactPhoneNumbersByUserId(@PathVariable long userId,
+                                                  @RequestBody List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
+        contactPhoneNumberService.updateContactPhoneNumbersByUserId(userId, contactPhoneNumberDtoList);
     }
 }

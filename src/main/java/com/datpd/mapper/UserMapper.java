@@ -1,7 +1,6 @@
 package com.datpd.mapper;
 
 import com.datpd.dto.UserDto;
-import com.datpd.entity.ContactPhoneNumberEntity;
 import com.datpd.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,5 +16,9 @@ public class UserMapper {
                 .name(userEntity.getName())
                 .primaryPhoneNumber(userEntity.getPrimaryPhoneNumber())
                 .build();
+    }
+
+    public List<UserDto> map(List<UserEntity> userEntities) {
+        return userEntities.stream().map(this::map).collect(Collectors.toList());
     }
 }

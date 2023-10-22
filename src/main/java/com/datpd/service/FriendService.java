@@ -25,6 +25,7 @@ public class FriendService {
     }
 
     public List<FriendDto> getAllFriendsByUserId(long userId) {
+        log.info("Get all friends by userId: {}", userId);
         List<FriendEntity> friendEntities = friendRepository.findAllByUserId(userId);
         if (friendEntities.size() > 0)
             return friendMapper.mapByUserId(userId, friendEntities);

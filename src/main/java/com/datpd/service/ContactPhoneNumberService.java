@@ -24,12 +24,15 @@ public class ContactPhoneNumberService {
 
     public List<ContactPhoneNumberDto> getAllContactPhoneNumberByUserId(long userId) {
         List<ContactPhoneNumberEntity> contactPhoneNumberEntities = contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
-        if (contactPhoneNumberEntities.size() > 0)
+        if (contactPhoneNumberEntities.size() > 0) {
+            log.info("Get all contact phone numbers by userId: {}", userId);
             return contactPhoneNumberMapper.map(contactPhoneNumberEntities);
+        }
         return null;
     }
 
     public void updateContactPhoneNumbersByUserId(long userId, List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
+        log.info("Update contact phone numbers by userId: {}", userId);
         contactPhoneNumberRepository.deleteAllByUserId(userId);
         contactPhoneNumberRepository.saveAll(contactPhoneNumberMapper.map(userId, contactPhoneNumberDtoList));
     }
