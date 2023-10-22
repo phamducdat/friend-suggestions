@@ -2,17 +2,19 @@ package com.datpd.service;
 
 import com.datpd.dto.FriendSuggestionDto;
 import com.datpd.entity.ContactPhoneNumberEntity;
-import com.datpd.entity.UserEntity;
 import com.datpd.mapper.FriendSuggestionMapper;
 import com.datpd.repository.ContactPhoneNumberRepository;
 import com.datpd.repository.FriendRepository;
 import com.datpd.repository.UserRepository;
+import com.datpd.utils.CacheKeyEnum;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,33 +30,46 @@ public class FriendSuggestionService {
 
     private final FriendService friendService;
 
+    private final RedissonClient redissonClient;
+
     public FriendSuggestionService(UserRepository userRepository,
                                    ContactPhoneNumberRepository contactPhoneNumberRepository,
                                    FriendSuggestionMapper friendSuggestionMapper,
-                                   FriendRepository friendRepository, FriendService friendService) {
+                                   FriendRepository friendRepository, FriendService friendService,
+                                   RedissonClient redissonClient) {
         this.userRepository = userRepository;
         this.contactPhoneNumberRepository = contactPhoneNumberRepository;
         this.friendSuggestionMapper = friendSuggestionMapper;
         this.friendRepository = friendRepository;
         this.friendService = friendService;
+        this.redissonClient = redissonClient;
     }
 
     public List<FriendSuggestionDto> getFriendSuggestionsByUserId(long userId) {
-        Optional<UserEntity> userEntity = userRepository.findById(userId);
-        if (userEntity.isPresent()) {
-            log.info("Get friend suggestions by userId: {}", userId);
-            List<ContactPhoneNumberEntity> contactPhoneNumberEntities =
-                    contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
+        log.info("Get friend suggestions by userId: {}", userId);
+        RBucket<List<FriendSuggestionDto>> friendSuggestionDtoListBucket = redissonClient.getBucket(CacheKeyEnum.USER_FRIEND_SUGGESTIONS.genKey(userId));
+        List<FriendSuggestionDto> cachedFriendSuggestionDtoList = friendSuggestionDtoListBucket.get();
 
-            Set<String> friendPhoneNumbers = friendService.getFriendPhoneNumbersByUserId(userId);
+        if (cachedFriendSuggestionDtoList != null)
+            return cachedFriendSuggestionDtoList;
 
-            List<ContactPhoneNumberEntity> friendSuggestionPhoneNumbers =
-                    contactPhoneNumberEntities.stream().filter(s -> !friendPhoneNumbers.contains(s.getContactPhoneNumber())
-                                    && userRepository.findByPrimaryPhoneNumber(s.getContactPhoneNumber()) != null)
-                            .collect(Collectors.toList());
+        List<ContactPhoneNumberEntity> contactPhoneNumberEntities =
+                contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
 
-            return friendSuggestionMapper.map(friendSuggestionPhoneNumbers);
+        Set<String> friendPhoneNumbers = friendService.getFriendPhoneNumbersByUserId(userId);
+
+        List<ContactPhoneNumberEntity> friendSuggestionPhoneNumbers =
+                contactPhoneNumberEntities.stream().filter(s -> !friendPhoneNumbers.contains(s.getContactPhoneNumber())
+                                && userRepository.findByPrimaryPhoneNumber(s.getContactPhoneNumber()) != null)
+                        .collect(Collectors.toList());
+
+        List<FriendSuggestionDto> friendSuggestionDtoList = friendSuggestionMapper.map(friendSuggestionPhoneNumbers);
+
+        if (friendSuggestionDtoList != null) {
+            friendSuggestionDtoListBucket.set(friendSuggestionDtoList);
+            friendSuggestionDtoListBucket.expire(10, TimeUnit.MINUTES);
         }
-        return null;
+
+        return friendSuggestionDtoList;
     }
 }

@@ -67,5 +67,9 @@ public class UserController {
         return friendSuggestionService.getFriendSuggestionsByUserId(userId);
     }
 
+    @DeleteMapping("/{userId}/friends")
+    public void reset(@PathVariable long userId) {
+        friendService.resetFriends(userId);
+    }
 
 }
