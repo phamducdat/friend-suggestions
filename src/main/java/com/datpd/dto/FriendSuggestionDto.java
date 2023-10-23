@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FriendSuggestionDto {
 
+
     private String friendSuggestionName;
     private String friendSuggestionPhoneNumber;
 }

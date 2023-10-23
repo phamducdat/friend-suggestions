@@ -2,8 +2,6 @@ package com.datpd.mapper;
 
 import com.datpd.dto.ContactPhoneNumberDto;
 import com.datpd.entity.ContactPhoneNumberEntity;
-import com.datpd.entity.FriendEntity;
-import com.datpd.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,8 +9,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ContactPhoneNumberMapper {
-
-
 
 
     public ContactPhoneNumberEntity map(long userId, ContactPhoneNumberDto contactPhoneNumberDto) {

@@ -1,13 +1,17 @@
 package com.datpd.controller;
 
+import com.datpd.domain.ContactPhoneNumbersDomain;
 import com.datpd.dto.ContactPhoneNumberDto;
 import com.datpd.dto.FriendDto;
 import com.datpd.dto.FriendSuggestionDto;
 import com.datpd.dto.UserDto;
+import com.datpd.producer.FriendSuggestionsProducer;
 import com.datpd.service.ContactPhoneNumberService;
 import com.datpd.service.FriendService;
 import com.datpd.service.FriendSuggestionService;
 import com.datpd.service.UserService;
+import com.datpd.utils.ApiTypeEnum;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +30,18 @@ public class UserController {
 
     private final FriendSuggestionService friendSuggestionService;
 
+    private final FriendSuggestionsProducer friendSuggestionsProducer;
+
     public UserController(UserService userService,
                           ContactPhoneNumberService contactPhoneNumberService,
                           FriendService friendService,
-                          FriendSuggestionService friendSuggestionService) {
+                          FriendSuggestionService friendSuggestionService,
+                          FriendSuggestionsProducer friendSuggestionsProducer) {
         this.userService = userService;
         this.contactPhoneNumberService = contactPhoneNumberService;
         this.friendService = friendService;
         this.friendSuggestionService = friendSuggestionService;
+        this.friendSuggestionsProducer = friendSuggestionsProducer;
     }
 
     @GetMapping()
@@ -53,8 +61,14 @@ public class UserController {
 
     @PutMapping("/{userId}/contact-phone-number")
     public void updateContactPhoneNumbersByUserId(@PathVariable long userId,
-                                                  @RequestBody List<ContactPhoneNumberDto> contactPhoneNumberDtoList) {
-        contactPhoneNumberService.updateContactPhoneNumbersByUserId(userId, contactPhoneNumberDtoList);
+                                                  @RequestBody List<ContactPhoneNumberDto> contactPhoneNumberDtoList)
+            throws JsonProcessingException {
+        ContactPhoneNumbersDomain contactPhoneNumbersDomain = ContactPhoneNumbersDomain.builder()
+                .userId(userId)
+                .contactPhoneNumberDtoList(contactPhoneNumberDtoList)
+                .apiType(ApiTypeEnum.UPDATE)
+                .build();
+        friendSuggestionsProducer.sendContactPhoneNumbers(contactPhoneNumbersDomain);
     }
 
     @GetMapping("/{userId}/friends")

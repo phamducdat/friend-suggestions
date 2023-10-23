@@ -1,4 +1,16 @@
 spring:
+  kafka:
+    template:
+      default-topic: wiinvent_friend_suggestions
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.LongSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.LongDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: wiinvent_friend_suggestions
+      auto-offset-reset: earliest
   datasource:
     url: jdbc:mysql://localhost:3306/friend_suggestions
     username: root
@@ -6,5 +18,13 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        tool:
+          hbm2ddl: DEBUG
+        SQL: DEBUG

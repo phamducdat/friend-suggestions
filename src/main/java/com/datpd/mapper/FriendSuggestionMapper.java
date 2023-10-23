@@ -1,8 +1,7 @@
 package com.datpd.mapper;
 
 import com.datpd.dto.FriendSuggestionDto;
-import com.datpd.entity.ContactPhoneNumberEntity;
-import com.datpd.entity.UserEntity;
+import com.datpd.entity.FriendSuggestionEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,14 +10,16 @@ import java.util.stream.Collectors;
 @Service
 public class FriendSuggestionMapper {
 
-    public FriendSuggestionDto map(ContactPhoneNumberEntity userEntity) {
+
+    public FriendSuggestionDto map(FriendSuggestionEntity friendSuggestionEntity) {
         return FriendSuggestionDto.builder()
-                .friendSuggestionName(userEntity.getContactUserName())
-                .friendSuggestionPhoneNumber(userEntity.getContactPhoneNumber())
+                .friendSuggestionName(friendSuggestionEntity.getUserFriendNameSuggestion())
+                .friendSuggestionPhoneNumber(friendSuggestionEntity.getUserFriendPhoneSuggestion())
                 .build();
     }
 
-    public List<FriendSuggestionDto> map(List<ContactPhoneNumberEntity> userEntities) {
-        return userEntities.stream().map(this::map).collect(Collectors.toList());
+    public List<FriendSuggestionDto> map(List<FriendSuggestionEntity> friendSuggestionEntities) {
+        return friendSuggestionEntities.stream().map(this::map).collect(Collectors.toList());
     }
+
 }
