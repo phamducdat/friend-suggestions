@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,14 +45,12 @@ public class ContactPhoneNumberService {
         this.objectMapper = objectMapper;
     }
 
-    public List<ContactPhoneNumberDto> getAllContactPhoneNumberByUserId(long userId) {
-        List<ContactPhoneNumberEntity> contactPhoneNumberEntities = contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId);
-        if (contactPhoneNumberEntities.size() > 0) {
-            log.info("Get all contact phone numbers by userId: {}", userId);
-            return contactPhoneNumberMapper.map(contactPhoneNumberEntities);
-        }
-        return null;
+    public Page<ContactPhoneNumberDto> getAllContactPhoneNumberByUserId(long userId, int page, int pageSize) {
+        Page<ContactPhoneNumberEntity> contactPhoneNumberEntityPage =
+                contactPhoneNumberRepository.getContactPhoneNumberEntitiesByUserId(userId, PageRequest.of(page, pageSize));
+        return contactPhoneNumberEntityPage.map(contactPhoneNumberMapper::map);
     }
+
     @Transactional(rollbackFor = Exception.class)
     public void processContactPhoneNumbers(ConsumerRecord<Long, String> consumerRecord)
             throws JsonProcessingException {

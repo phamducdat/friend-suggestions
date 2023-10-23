@@ -13,6 +13,7 @@ import com.datpd.service.UserService;
 import com.datpd.utils.ApiTypeEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,8 +46,11 @@ public class UserController {
     }
 
     @GetMapping()
-    public List<UserDto> getUsers() {
-        return userService.getUsers();
+    public Page<UserDto> getUsers(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize
+    ) {
+        return userService.getUsers(page, pageSize);
     }
 
     @GetMapping("/{userId}")
@@ -55,8 +59,11 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/contact-phone-numbers")
-    public List<ContactPhoneNumberDto> getContactPhoneNumbersByUserId(@PathVariable long userId) {
-        return contactPhoneNumberService.getAllContactPhoneNumberByUserId(userId);
+    public Page<ContactPhoneNumberDto> getContactPhoneNumbersByUserId(@PathVariable long userId,
+                                                                      @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                      @RequestParam(name = "pageSize", defaultValue = "10") int pageSize
+    ) {
+        return contactPhoneNumberService.getAllContactPhoneNumberByUserId(userId, page, pageSize);
     }
 
     @PutMapping("/{userId}/contact-phone-number")
@@ -72,12 +79,16 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friends")
-    public List<FriendDto> getFriendsByUserId(@PathVariable long userId) {
+    public List<FriendDto> getFriendsByUserId(@PathVariable long userId,
+                                              @RequestParam(name = "page", defaultValue = "1") int page,
+                                              @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         return friendService.getAllFriendsByUserId(userId);
     }
 
     @GetMapping("/{userId}/friend-suggestions")
-    public List<FriendSuggestionDto> getFriendSuggestionsByUserId(@PathVariable long userId) {
+    public List<FriendSuggestionDto> getFriendSuggestionsByUserId(@PathVariable long userId,
+                                                                  @RequestParam(name = "page", defaultValue = "1") int page,
+                                                                  @RequestParam(name = "pageSize", defaultValue = "10") int pageSize) {
         return friendSuggestionService.getFriendSuggestionsByUserId(userId);
     }
 

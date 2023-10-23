@@ -8,9 +8,10 @@ import com.datpd.utils.CacheKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -31,10 +32,12 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    public List<UserDto> getUsers() {
-        log.info("Get all users");
-        return userMapper.map(userRepository.findAll());
+    public Page<UserDto> getUsers(int page, int pageSize) {
+        log.info("Get all users with page: {} and page size : {}", page, pageSize);
+        Page<UserEntity> userEntityPage = userRepository.findAll(PageRequest.of(page, pageSize));
+        return userEntityPage.map(userMapper::map);
     }
+
 
     public UserDto getUserById(long userId) {
         log.info("Get user by id: {}", userId);
