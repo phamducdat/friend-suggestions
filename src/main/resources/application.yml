@@ -18,13 +18,5 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
-
-logging:
-  level:
-    org:
-      hibernate:
-        tool:
-          hbm2ddl: DEBUG
-        SQL: DEBUG

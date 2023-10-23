@@ -38,7 +38,9 @@ public class FriendService {
 
 
     public FriendService(FriendRepository friendRepository,
-                         FriendMapper friendMapper, UserRepository userRepository, ContactPhoneNumberRepository contactPhoneNumberRepository, RedissonClient redissonClient) {
+                         FriendMapper friendMapper, UserRepository userRepository,
+                         ContactPhoneNumberRepository contactPhoneNumberRepository,
+                         RedissonClient redissonClient) {
         this.friendRepository = friendRepository;
         this.friendMapper = friendMapper;
         this.userRepository = userRepository;
