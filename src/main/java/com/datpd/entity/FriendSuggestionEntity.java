@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 
@@ -13,7 +12,9 @@ import javax.persistence.*;
 @Data
 @Builder
 @Entity
-@Table(name = "friend_suggestion_entity")
+@Table(name = "friend_suggestion_entity",
+        indexes = {@Index(name = "idx_user_target_id", columnList = "user_target_id")}
+)
 public class FriendSuggestionEntity {
 
     @Id

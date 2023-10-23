@@ -7,14 +7,15 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Entity
-@Table(name = "contact_phone_number_entity")
+@Table(name = "contact_phone_number_entity",
+        indexes = {@Index(name = "idx_user_id_contact_phone_number", columnList = "user_Id, contact_phone_number")}
+)
 public class ContactPhoneNumberEntity {
 
     @Id

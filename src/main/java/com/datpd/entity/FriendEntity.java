@@ -12,7 +12,8 @@ import javax.persistence.*;
 @Data
 @Builder
 @Entity
-@Table(name = "friend_entity")
+@Table(name = "friend_entity",
+        indexes = {@Index(name = "idx_user_id_1_user_id_2", columnList = "user_Id_1, user_Id_2")})
 public class FriendEntity {
 
     @Id
