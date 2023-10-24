@@ -1,7 +1,6 @@
 package com.datpd.service;
 
 import com.datpd.dto.FriendDto;
-import com.datpd.entity.ContactPhoneNumberEntity;
 import com.datpd.entity.FriendEntity;
 import com.datpd.entity.UserEntity;
 import com.datpd.mapper.FriendMapper;
@@ -86,29 +85,25 @@ public class FriendService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void makeFriends(long userId, List<ContactPhoneNumberEntity> contactPhoneNumberEntities) {
+    public void makeFriends(long userId) {
         log.info("Make Friends by userId: {} start", userId);
         Optional<UserEntity> optionalUserEntity1 = userRepository.findById(userId);
         if (optionalUserEntity1.isPresent()) {
             UserEntity userEntity1 = optionalUserEntity1.get();
-            Set<String> currentFriendPhoneNumbers = getFriendPhoneNumbersByUserId(userId);
-            RBucket<List<FriendDto>> friendsDtoBucket = redissonClient.getBucket(CacheKeyEnum.USER_FRIENDS.genKey(userId));
-            contactPhoneNumberEntities.forEach(contactPhoneNumberEntity -> {
-                if (!currentFriendPhoneNumbers.contains(contactPhoneNumberEntity.getContactPhoneNumber())) {
-                    UserEntity userEntity2 =
-                            userRepository.findByPrimaryPhoneNumber(contactPhoneNumberEntity.getContactPhoneNumber());
+            List<UserEntity> userEntitiesInNotFriend = userRepository.findUserEntitiesNotInFriendForUserId(userId);
+            List<Long> userIdInsNotFriend = userEntitiesInNotFriend.stream().map(UserEntity::getId).collect(Collectors.toList());
+            List<Long> newFriendUserIds = contactPhoneNumberRepository.findUserIdsByPhoneNumberAndUserPhoneNumberIds(
+                    userEntity1.getPrimaryPhoneNumber(), userIdInsNotFriend);
 
-                    if (userEntity2 != null &&
-                            contactPhoneNumberRepository.findByUserIdAndContactPhoneNumber(userEntity2.getId(),
-                                    userEntity1.getPrimaryPhoneNumber()) != null)
-                        friendRepository.save(friendMapper.map(userEntity1, userEntity2));
-                }
-            });
-            friendsDtoBucket.delete();
+            friendRepository.saveAll(newFriendUserIds.stream().map(newFriendUserId -> {
+                Optional<UserEntity> optionalUserEntity2 = userEntitiesInNotFriend.stream().filter(userEntity -> userEntity.getId() == newFriendUserId).findFirst();
+                return optionalUserEntity2.map(userEntity -> friendMapper.map(userEntity1, userEntity)).orElse(null);
+            }).collect(Collectors.toList()));
             log.info("Make Friends by userId: {} end", userId);
 
         }
     }
+
 
     @Transactional(rollbackFor = Exception.class)
     public void resetFriends(long userId) {
