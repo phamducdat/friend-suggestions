@@ -58,9 +58,9 @@ public class StartConfig {
                     Random random = new Random();
                     List<Integer> randomNumbers = new ArrayList<>();
 
-                    for (int j = 0; j < 20; j++) {
-                        int randomNumber = random.nextInt(100);
-                        randomNumbers.add(randomNumber);
+                    for (int j = 1; j < 20; j++) {
+                        int candidate = (100 + i + j) % 100;
+                        randomNumbers.add(candidate);
                     }
 
                     contactPhoneNumberRepository.saveAll(randomNumbers.stream().map(

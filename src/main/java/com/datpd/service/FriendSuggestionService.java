@@ -93,7 +93,6 @@ public class FriendSuggestionService {
 
             friendSuggestionRepository.saveAll(to);
         }
-        log.info("Make friend suggestions by userId: {} end", userId);
 
     }
 

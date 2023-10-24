@@ -78,8 +78,8 @@ public class ContactPhoneNumberService {
             contactPhoneNumberRepository.deleteAllByUserId(userId);
         List<ContactPhoneNumberEntity> contactPhoneNumberEntities = contactPhoneNumberRepository.saveAll(contactPhoneNumberMapper.map(userId, contactPhoneNumberDtoList));
         friendSuggestionDtoListBucket.delete();
-        friendService.makeFriends(userId);
-        friendSuggestionService.makeFriendSuggestions(userId, contactPhoneNumberEntities);
+        friendService.makeFriendsAndFriendSuggestions(userId);
+//        friendSuggestionService.makeFriendSuggestions(userId, contactPhoneNumberEntities);
     }
 
 }
