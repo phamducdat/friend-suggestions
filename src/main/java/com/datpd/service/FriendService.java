@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,22 +48,10 @@ public class FriendService {
 
     public List<FriendDto> getAllFriendsByUserId(long userId) {
         log.info("Get all friends by userId: {}", userId);
-        RBucket<List<FriendDto>> friendsDtoBucket = redissonClient.getBucket(CacheKeyEnum.USER_FRIENDS.genKey(userId));
-        List<FriendDto> cachedFriendsDto = friendsDtoBucket.get();
-
-        if (cachedFriendsDto != null)
-            return cachedFriendsDto;
-
 
         List<FriendEntity> friendEntities = friendRepository.findAllByUserId(userId);
-        List<FriendDto> friendsDto = friendMapper.mapByUserId(userId, friendEntities);
 
-        if (friendsDto != null) {
-            friendsDtoBucket.set(friendsDto);
-            friendsDtoBucket.expire(10, TimeUnit.MINUTES);
-        }
-
-        return friendsDto;
+        return friendMapper.mapByUserId(userId, friendEntities);
     }
 
     public Set<String> getFriendPhoneNumbersByUserId(long userId) {
@@ -92,8 +79,10 @@ public class FriendService {
             UserEntity userEntity1 = optionalUserEntity1.get();
             List<UserEntity> userEntitiesInNotFriend = userRepository.findUserEntitiesNotInFriendForUserId(userId);
             List<Long> userIdInsNotFriend = userEntitiesInNotFriend.stream().map(UserEntity::getId).collect(Collectors.toList());
+            log.info("userEntitiesInNotFriend: {}", userIdInsNotFriend);
             List<Long> newFriendUserIds = contactPhoneNumberRepository.findUserIdsByPhoneNumberAndUserPhoneNumberIds(
                     userEntity1.getPrimaryPhoneNumber(), userIdInsNotFriend);
+            log.info("newFriendUserIds : {}", newFriendUserIds);
 
             friendRepository.saveAll(newFriendUserIds.stream().map(newFriendUserId -> {
                 Optional<UserEntity> optionalUserEntity2 = userEntitiesInNotFriend.stream().filter(userEntity -> userEntity.getId() == newFriendUserId).findFirst();
